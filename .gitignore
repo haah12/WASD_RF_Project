@@ -1,0 +1,25 @@
+# env
+rf_env/
+.venv/
+venv/
+
+# data & outputs
+data/
+outputs/
+
+# big binary artifacts
+*.bin
+*.npy
+*.npz
+*.pkl
+*.joblib
+*.pt
+*.zip
+
+# python cache
+__pycache__/
+*.pyc
+
+# OS/IDE
+.vscode/
+.DS_Store
