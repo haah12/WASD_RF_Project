@@ -1,0 +1,61 @@
+agents:
+  phase1:
+    name: SOCLE_RF_Agent
+    model: llama3.1
+    input: data/36_LTE_1
+    output: outputs/WASD_RF_dataset.csv
+    scripts:
+      - src/main.py
+
+  phase2:
+    name: Anomaly_Detection_Agent
+    model: llama3.1
+    input: outputs/WASD_RF_dataset.csv
+    output: outputs/WASD_RF_dataset_scored.csv
+    scripts:
+      - src/phase2_select_features.py
+      - src/phase2_train_ae_features.py
+      - src/phase2_plot_timeseries.py
+
+  phase3:
+    name: AROCLE_RF_Agent
+    model: llama3.1
+    input: outputs/WASD_RF_dataset_scored.csv
+    output: outputs/WASD_RF_arocle_scored.csv
+    scripts:
+      - src/phase3_build_arocle_features.py
+      - src/phase3_label_arocle_rules.py
+      - src/phase3_train_arocle_classifier.py
+      - src/phase3_infer_arocle.py
+      - src/phase3_compare_arocle_rules_vs_model.py
+      - src/phase3_plot_arocle_timeline_presentation.py
+
+  phase4:
+    name: SPECTRA_Risk_Agent
+    model: mistral
+    input: outputs/WASD_RF_arocle_scored.csv
+    output: outputs/WASD_RF_risk_scored.csv
+    scripts:
+      - src/phase4_compute_spectra_scores.py
+      - src/phase4_compute_risk_score.py
+      - src/phase4_plot_spectra_timeline.py
+
+  phase5:
+    name: Temporal_Anticipation_Agent
+    model: llama3.1
+    input: outputs/WASD_RF_risk_scored.csv
+    output: outputs/WASD_RF_anticipation_v5.csv
+    scripts:
+      - src/phase5_build_sequences.py
+      - src/phase5_train_temporal_model.py
+      - src/phase5_infer_anticipation.py
+      - src/phase5_compute_anticipation_metrics.py
+
+  phase6:
+    name: DRL_Decision_Agent
+    model: qwen2.5
+    input: outputs/WASD_RF_anticipation_v5.csv
+    output: outputs/drl_dqn_model_final.zip
+    scripts:
+      - src/phase6_train_drl_agent.py
+      - src/phase6_evaluate_drl.py
